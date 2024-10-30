@@ -167,10 +167,8 @@ venv/
 ENV/
 env.bak/
 venv.bak/
-.backvenv
-backvenv/
-/backvenv/
-/backvenv
+.env/
+.venv/
 
 # Spyder project settings
 .spyderproject
@@ -203,7 +201,6 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-todolistvenv/
 /migrations
 .migrations/
 migrations/
