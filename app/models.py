@@ -45,10 +45,10 @@ class Usuario(db.Model):
     def serialize_public(self):
         post_totales = Post.query.filter_by(autor_id=self.id).count()
         return{
-            'id':self.id,
             'Usuario':self.username,
             'status':self.status,
-            'cantidad de posteos':post_totales
+            'cantidad de posteos':post_totales,
+            'títulos de post del usuario':[post.title for post in self.posts]
         }
     
     def serialize_private(self):
@@ -62,7 +62,8 @@ class Usuario(db.Model):
             'rol':self.rol,
             'status':self.status,
             'fecha de creación':self.date_register,
-            'cantidad de posteos':post_totales
+            'cantidad de posteos':post_totales,
+            'títulos de post del usuario':[post.title for post in self.posts]
         }
 
 class Post(db.Model):
@@ -95,10 +96,13 @@ class Post(db.Model):
             'id':self.id,
             'titulo':self.title,
             'contenido':self.content,
-            'fecha de creación':self.creation_date,
+            'fecha de creación':self.creation_date.strftime('%d/%m/%Y - %H:%M'),
             'creador':self.autor.username,
+            'categorias':self.category_id,
             'comentarios totales':len(self.comments),
             'tags':[tag.name for tag in self.tags],
+            'última actualización':self.update_date.strftime('%d/%m/%Y - %H:%M'),
+            'categoría':self.categoria.name
         }
     
 class Comment(db.Model):
@@ -135,12 +139,8 @@ class Category(db.Model):
         return{
             'id':self.id,
             'categoría':self.name,
-            'total de categorias por post':len(self.posts)
-        }
-    
-    def get_total_categories(self):
-        return {
-            'total de categorias':len(self.posts)
+            'total de categorias':len(self.posts), # Total de posts en ésta categoría.
+            'total de post por título':[post.title for post in self.posts] # Todos los títulos de la categoría.
         }
 
 class Tag(db.Model):
@@ -155,9 +155,6 @@ class Tag(db.Model):
         return{
             'id':self.id,
             'tag':self.name,
-        }
-    
-    def total_tag(self):
-        return{
-            'total de tags': len(self.name)
+            'total de tags':len(self.posts),
+            'total de post por título':[post.title for post in self.posts]
         }

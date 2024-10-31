@@ -16,4 +16,8 @@ def create_app():
     migrate.init_app(app,db)
     jwt.init_app(app)
 
+    from app.models import Usuario, Tag, Post, Comment, Category, post_tag
+
+    
+
     return app
