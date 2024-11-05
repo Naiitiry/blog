@@ -120,11 +120,11 @@ def edit_profile_status(user_id):
     usuario.status = data.get('status')
 
     if usuario.status == "activo":
-        Usuario.activate()
+        usuario.activate()
     elif usuario.status == "bloqueado":
-        Usuario.block()
+        usuario.block()
     elif usuario.status == "inactivo":
-        Usuario.delete()
+        usuario.delete()
     else:
         return jsonify({'error':'Debe eligir 1 de los 3 estados.'}), 403
     
@@ -178,12 +178,10 @@ def edit_post(post_id):
         post.content = data.get('contenido',post.content)
         post.category_id = data.get('categoria',post.category_id)
         post.status_post = data.get('status_post')
-        if post.status_post == 'eliminado':
-            Post.delete()
-        elif post.status_post == 'publicado':
-            Post.publish()
+        if post.status_post == 'publicado':
+            post.publish()
         elif post.status_post == 'borrador':
-            Post.draft()
+            post.draft()
         new_tags_id = data.get('tag',[])
         if new_tags_id:
             new_tags = Tag.query.filter(Tag.id.in_(new_tags_id)).all()
@@ -194,3 +192,19 @@ def edit_post(post_id):
         except Exception as e:
             return jsonify({'error':f' {str(e)}'})
         
+@jwt_required()
+def delete_post(post_id):
+    user_iden = get_jwt_identity()
+    post = Post.query.get_or_404(post_id)
+    if post.id == user_iden.id or user_iden.rol == "admin":
+        post.delete()
+        return jsonify({'message':f'El post {post['title']}, fue eliminado correctamente.'}), 200
+    return jsonify({'error':'No posees los permisos suficientes para eliminar el post.'}), 403
+
+
+"""
+
+                    CRUD de CATEGORIAS
+
+"""
+
